@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"math/rand"
+	"prj-go/domain"
 	"strconv"
 	"time"
 )
@@ -12,10 +13,15 @@ const (
 	pointsPerQuestion = 10
 )
 
+var id uint64 = 1
+
 func main() {
 	fmt.Println("Вітаємо у грі MATHREVENGE!")
 	time.Sleep(1 * time.Second)
 
+}
+
+func play() domain.User {
 	for i := 5; i > 0; i-- {
 		fmt.Println(i)
 		time.Sleep(1 * time.Second)
@@ -48,5 +54,22 @@ func main() {
 	timeSpent := end.Sub(start)
 
 	fmt.Printf("Молодчинка, впорався всього за %v!", timeSpent)
-	time.Sleep(5 * time.Second)
+	fmt.Println("Введіть своє ім'я:")
+
+	name := ""
+	fmt.Scan(&name)
+
+	// var user domain.User
+	// user.Id = id
+	// user.Name = name
+	// user.Time = timeSpent
+
+	user := domain.User{
+		Id:   id,
+		Name: name,
+		Time: timeSpent,
+	}
+	id++
+
+	return user
 }
