@@ -1,15 +1,18 @@
 package main
 
 import (
+	"encoding/json"
 	"fmt"
 	"math/rand"
+	"os"
 	"prj-go/domain"
+	"sort"
 	"strconv"
 	"time"
 )
 
 const (
-	totalPoints       = 50
+	totalPoints       = 10
 	pointsPerQuestion = 10
 )
 
@@ -19,10 +22,58 @@ func main() {
 	fmt.Println("Вітаємо у грі MATHREVENGE!")
 	time.Sleep(1 * time.Second)
 
+	var users []domain.User
+	users = append(users, domain.User{
+		Id:   1,
+		Name: "Mykola",
+		Time: 5 * time.Second,
+	})
+	users = append(users, domain.User{
+		Id:   2,
+		Name: "Vasyl",
+		Time: 2 * time.Second,
+	})
+	users = append(users, domain.User{
+		Id:   3,
+		Name: "Niko",
+		Time: 10 * time.Second,
+	})
+	sortAndSave(users)
+
+	// for {
+	// 	menu()
+
+	// 	choice := ""
+	// 	fmt.Scan(&choice)
+
+	// 	switch choice {
+	// 	case "1":
+	// 		user := play()
+	// 		users = append(users, user)
+	// 	case "2":
+	// 		for i, user := range users {
+	// 			fmt.Printf(
+	// 				"i: %v, id: %v, name: %s, time: %v\n",
+	// 				i, user.Id, user.Name, user.Time,
+	// 			)
+	// 		}
+	// 	case "3":
+	// 		return
+	// 	default:
+	// 		fmt.Println("Зробіть коректний вибір!")
+	// 	}
+	// }
+
+}
+
+func menu() {
+	fmt.Println("1. Почати гру")
+	fmt.Println("2. Переглянути рейтинг")
+	fmt.Println("3. Вийти")
 }
 
 func play() domain.User {
-	for i := 5; i > 0; i-- {
+	for i := 3; i > 0; i-- {
 		fmt.Println(i)
 		time.Sleep(1 * time.Second)
 	}
@@ -72,4 +123,33 @@ func play() domain.User {
 	id++
 
 	return user
+}
+
+func sortAndSave(users []domain.User) {
+	sort.SliceStable(users, func(i, j int) bool {
+		return users[i].Time < users[j].Time
+	})
+
+	file, err := os.OpenFile(
+		"users.json",
+		os.O_RDWR|os.O_CREATE|os.O_TRUNC,
+		0755)
+	if err != nil {
+		fmt.Printf("Error: %s", err)
+		return
+	}
+
+	defer func(f *os.File) {
+		err = f.Close()
+		if err != nil {
+			fmt.Printf("Error: %s", err)
+		}
+	}(file)
+
+	encoder := json.NewEncoder(file)
+	err = encoder.Encode(users)
+	if err != nil {
+		fmt.Printf("Error: %s", err)
+		return
+	}
 }
