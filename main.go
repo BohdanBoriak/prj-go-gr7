@@ -23,46 +23,32 @@ func main() {
 	time.Sleep(1 * time.Second)
 
 	var users []domain.User
-	users = append(users, domain.User{
-		Id:   1,
-		Name: "Mykola",
-		Time: 5 * time.Second,
-	})
-	users = append(users, domain.User{
-		Id:   2,
-		Name: "Vasyl",
-		Time: 2 * time.Second,
-	})
-	users = append(users, domain.User{
-		Id:   3,
-		Name: "Niko",
-		Time: 10 * time.Second,
-	})
-	sortAndSave(users)
 
-	// for {
-	// 	menu()
+	for {
+		menu()
 
-	// 	choice := ""
-	// 	fmt.Scan(&choice)
+		choice := ""
+		fmt.Scan(&choice)
 
-	// 	switch choice {
-	// 	case "1":
-	// 		user := play()
-	// 		users = append(users, user)
-	// 	case "2":
-	// 		for i, user := range users {
-	// 			fmt.Printf(
-	// 				"i: %v, id: %v, name: %s, time: %v\n",
-	// 				i, user.Id, user.Name, user.Time,
-	// 			)
-	// 		}
-	// 	case "3":
-	// 		return
-	// 	default:
-	// 		fmt.Println("Зробіть коректний вибір!")
-	// 	}
-	// }
+		switch choice {
+		case "1":
+			user := play()
+			users = getUsers()
+			users = append(users, user)
+			sortAndSave(users)
+		case "2":
+			for i, user := range users {
+				fmt.Printf(
+					"i: %v, id: %v, name: %s, time: %v\n",
+					i, user.Id, user.Name, user.Time,
+				)
+			}
+		case "3":
+			return
+		default:
+			fmt.Println("Зробіть коректний вибір!")
+		}
+	}
 
 }
 
@@ -152,4 +138,46 @@ func sortAndSave(users []domain.User) {
 		fmt.Printf("Error: %s", err)
 		return
 	}
+}
+
+func getUsers() []domain.User {
+	var users []domain.User
+
+	info, err := os.Stat("users.json")
+	if err != nil {
+		if os.IsNotExist(err) {
+			_, err := os.Create("users.json")
+			if err != nil {
+				fmt.Printf("Error: %s", err)
+				return nil
+			}
+			return nil
+		}
+		fmt.Printf("Error: %s", err)
+		return nil
+	}
+
+	if info.Size() != 0 {
+		file, err := os.Open("users.json")
+		if err != nil {
+			fmt.Printf("Error: %s", err)
+			return nil
+		}
+
+		defer func(f *os.File) {
+			err = f.Close()
+			if err != nil {
+				fmt.Printf("Error: %s", err)
+			}
+		}(file)
+
+		decoder := json.NewDecoder(file)
+		err = decoder.Decode(&users)
+		if err != nil {
+			fmt.Printf("Error: %s", err)
+			return nil
+		}
+	}
+
+	return users
 }
