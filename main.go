@@ -37,6 +37,7 @@ func main() {
 			users = append(users, user)
 			sortAndSave(users)
 		case "2":
+			users = getUsers()
 			for i, user := range users {
 				fmt.Printf(
 					"i: %v, id: %v, name: %s, time: %v\n",
