@@ -22,7 +22,12 @@ func main() {
 	fmt.Println("Вітаємо у грі MATHREVENGE!")
 	time.Sleep(1 * time.Second)
 
-	var users []domain.User
+	users := getUsers()
+	for _, user := range users {
+		if user.Id >= id {
+			id = user.Id + 1
+		}
+	}
 
 	for {
 		menu()
